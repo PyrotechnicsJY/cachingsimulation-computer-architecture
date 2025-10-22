@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/chad/Desktop/Coding/UTSA/CS3853/cachingsimulation-computer-architecture/cachingsimulation-computer-architecture",
+      "program": "/Users/chad/Desktop/Coding/UTSA/CS3853/cachingsimulation-computer-architecture/cachingsimulation-computer-architecture/build/Debug/outDebug"
+    }
+  ]
+}
