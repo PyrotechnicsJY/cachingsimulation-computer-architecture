@@ -2,13 +2,13 @@
 #include "calculations.h"
 
 static void print_report(const Config *c, const Results *r) {
-    printf("Cache Simulator - CS 3853 – Team #XX\n");
+    printf("Cache Simulator - CS 3853 - Team #1\n\n");
     printf("Trace File(s):\n");
     for (int i = 0; i < c->num_traces; ++i) {
-        printf("%s\n", c->traces[i]);
+        printf("\t%s\n", c->traces[i]);
     }
 
-    printf("***** Cache Input Parameters *****\n");
+    printf("\n***** Cache Input Parameters *****\n\n");
     printf("Cache Size: %d KB\n", c->cache_kb);
     printf("Block Size: %d bytes\n", c->block_bytes);
     printf("Associativity: %d\n", c->associativity);
@@ -18,9 +18,9 @@ static void print_report(const Config *c, const Results *r) {
     if (c->time_slice == -1) printf("Instructions / Time Slice: All\n");
     else printf("Instructions / Time Slice: %lld\n", c->time_slice);
 
-    printf("***** Cache Calculated Values *****\n");
+    printf("\n***** Cache Calculated Values *****\n\n");
     printf("Total # Blocks: %llu\n", (unsigned long long)r->blocks_total);
-    printf("Tag Size: %d bits (based on actual physical memory)\n", r->tag_bits);
+    printf("Tag Size: %d bits\n", r->tag_bits);
     printf("Index Size: %d bits\n", r->index_bits);
     printf("Total # Rows: %llu\n", (unsigned long long)r->rows_total);
     printf("Overhead Size: %llu bytes\n", (unsigned long long)r->overhead_bytes);
@@ -28,15 +28,11 @@ static void print_report(const Config *c, const Results *r) {
            r->impl_kb, (unsigned long long)r->impl_mem_bytes);
     printf("Cost: $%.2f @ $0.07 per KB\n", r->cost_usd);
 
-    printf("***** Physical Memory Calculated Values *****\n");
+    printf("\n***** Physical Memory Calculated Values *****\n\n");
     printf("Number of Physical Pages: %llu\n", (unsigned long long)r->phys_pages);
-    printf("Number of Pages for System: %llu ( %.2f * %llu = %llu )\n",
-           (unsigned long long)r->sys_pages, 
-           (double)(c->os_percent/100.0),
-           (unsigned long long)r->phys_pages,
+    printf("Number of Pages for System: %llu\n",
            (unsigned long long)r->sys_pages);
-    printf("Size of Page Table Entry: %d bits (1 valid bit, %d for PhysPage)\n",
-           r->pte_bits, r->pte_bits - 1);
+    printf("Size of Page Table Entry: %d bits\n", r->pte_bits);
     printf("Total RAM for Page Table(s): %llu bytes (512K entries * %d .trc files * %d / 8)\n",
            (unsigned long long)r->pgt_total_bytes, c->num_traces, r->pte_bits);
 }
