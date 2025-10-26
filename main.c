@@ -33,8 +33,7 @@ static void print_report(const Config *c, const Results *r) {
     printf("Number of Pages for System: %llu\n",
            (unsigned long long)r->sys_pages);
     printf("Size of Page Table Entry: %d bits\n", r->pte_bits);
-    printf("Total RAM for Page Table(s): %llu bytes (512K entries * %d .trc files * %d / 8)\n",
-           (unsigned long long)r->pgt_total_bytes, c->num_traces, r->pte_bits);
+    printf("Total RAM for Page Table(s): %llu bytes\n",(unsigned long long)r->pgt_total_bytes);
 }
 
 int main(int argc, char **argv) {
