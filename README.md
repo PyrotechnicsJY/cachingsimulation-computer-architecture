@@ -8,13 +8,17 @@ Group Members:
 This project is done in C.
 
 To compile the program, run:
+
 make
+
 This uses the provided Makefile to build an executable named cache_sim
 
 Alternatively, you can compile manually with:
+
 gcc main.c calculations.c -o cache_sim -lm
 
 Example usage:
+
 ./cache_sim -s 512 -b 16 -a 4 -r RR -p 1024 -n -1 -u 25 -f trace1.trc
 
 | Flag | Description                                                         |
@@ -29,4 +33,4 @@ Example usage:
 | `-f` | One to three trace file paths (e.g., `-f trace1.trc -f trace2.trc`) |
 
 To remove the compiled binary:
-rm cache_sim
+rm cache_sim.exe
