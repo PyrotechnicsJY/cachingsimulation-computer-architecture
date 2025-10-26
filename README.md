@@ -2,8 +2,8 @@ CS-3853-001 Virtual Memory_&_Cache_Simulator
 
 Group Members: 
     - Cameron Bergeron (anl176)
-    - Christopher Delgado
-    - Chad Hoggard
+    - Christopher Delgado (duw866)
+    - Chad Hoggard (nsd690)
 
 This project is done in C.
 
@@ -11,15 +11,15 @@ To compile the program, run:
 
 make
 
-This uses the provided Makefile to build an executable named cache_sim
+This uses the provided Makefile to build an executable named VMCacheSim.exe
 
 Alternatively, you can compile manually with:
 
-gcc main.c calculations.c -o cache_sim -lm
+gcc main.c calculations.c -o VMCacheSim -lm
 
 Example usage:
 
-./cache_sim -s 512 -b 16 -a 4 -r RR -p 1024 -n -1 -u 25 -f trace1.trc
+./VMCacheSim -s 512 -b 16 -a 4 -r RR -p 1024 -n -1 -u 25 -f trace1.trc
 
 | Flag | Description                                                         |
 | ---- | ------------------------------------------------------------------- |
@@ -33,4 +33,4 @@ Example usage:
 | `-f` | One to three trace file paths (e.g., `-f trace1.trc -f trace2.trc`) |
 
 To remove the compiled binary:
-rm cache_sim.exe
+rm VMCacheSim.exe
