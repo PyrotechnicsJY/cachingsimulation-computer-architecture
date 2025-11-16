@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "calculations.h"
+#include "cache.h"
 
 static void print_report(const Config *c, const Results *r) {
     printf("Cache Simulator - CS 3853 - Team #1\n\n");
@@ -40,8 +41,23 @@ int main(int argc, char **argv) {
     Config cfg;
     Results res;
 
+    // NEW: cache structures (not actually used yet in Milestone 2)
+    Cache cache;
+    CacheStats stats = {0};  // zero-init all fields
+
     parse_args(argc, argv, &cfg);
     compute_results(&cfg, &res);
+
+      // Initialize cache based on CLI config
+    if (cache_init(&cache, &cfg) != 0) {
+        fprintf(stderr, "Warning: cache_init failed; continuing without cache.\n");
+        // For Milestone 2 we can still print the calculations & exit normally
+        print_report(&cfg, &res);
+        return 0;
+    }
+
     print_report(&cfg, &res);
+    // Clean up cache memory
+    cache_free(&cache);
     return 0;
 }
