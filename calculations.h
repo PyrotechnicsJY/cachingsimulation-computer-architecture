@@ -47,5 +47,6 @@ void parse_args(int argc, char **argv, Config *cfg);
 
 // Compute all milestone #1 results from inputs
 void compute_results(const Config *cfg, Results *out);
-
+// process trace files and run them with simulated caching and page tables 
+void process_trace(Config *c , Results* r);
 #endif // CALCULATIONS_H

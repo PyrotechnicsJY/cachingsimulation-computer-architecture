@@ -43,5 +43,6 @@ int main(int argc, char **argv) {
     parse_args(argc, argv, &cfg);
     compute_results(&cfg, &res);
     print_report(&cfg, &res);
+	process_trace(&cfg,&res);
     return 0;
 }
