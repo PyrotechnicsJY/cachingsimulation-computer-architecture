@@ -1,2 +1,2 @@
-cache_sim: main.c calculations.c calculations.h
-	gcc main.c calculations.c -o cache_sim -lm
+VMCacheSim: main.c calculations.c calculations.h cache.c cache.h
+	gcc main.c calculations.c cache.c -o VMCacheSim -lm
