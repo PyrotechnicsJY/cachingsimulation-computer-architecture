@@ -14,7 +14,6 @@ typedef struct {
 	page_table_entry *entries;
 	int max_size_pagetable;
 	int curr_size_pagetable;
-	uint32_t *ppn_list;
 } page_table;
 typedef struct {
 	uint32_t *freelist;
@@ -30,5 +29,7 @@ typedef struct {
 	int pg_fault;
 } statistics;
 
-void* make_page_table( Results *r , physical_memory *phys_mem, int amountofprocesses); 
+page_table* make_page_table(int amountofprocesses); 
+physical_memory* make_physical_memory(Results *r);
+void free_page_tables(page_table *pagetables, int amountofprocesses);
 #endif //
