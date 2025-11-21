@@ -1,0 +1,54 @@
+Cache Simulator - CS 3853 - Team #1
+
+Trace File(s):
+	A-9_new_1.5.pdf.trc
+	A-10_new_1.5_a.pdf.trc
+
+***** Cache Input Parameters *****
+
+Cache Size: 256 KB
+Block Size: 32 bytes
+Associativity: 2
+Replacement Policy: Round Robin
+Physical Memory: 2048 MB
+Percent Memory Used by System: 75.0%
+Instructions / Time Slice: All
+
+***** Cache Calculated Values *****
+
+Total # Blocks: 8192
+Tag Size: 14 bits
+Index Size: 12 bits
+Total # Rows: 4096
+Overhead Size: 15360 bytes
+Implementation Memory Size: 271.00 KB (277504 bytes)
+Cost: $18.97 @ $0.07 per KB
+
+***** Physical Memory Calculated Values *****
+
+Number of Physical Pages: 524288
+Number of Pages for System: 393216
+Size of Page Table Entry: 20 bits
+Total RAM for Page Table(s): 2621440 bytes
+
+***** VIRTUAL MEMORY SIMULATION RESULTS *****
+
+Physical Pages Used By SYSTEM:   393216
+Pages Available to User:         131072
+
+Virtual Pages Mapped:            1236
+        ------------------------------
+        Page Table Hits: 693240
+
+        Pages from Free: 1236
+
+        Total Page Faults: 0
+
+Page Table Usage Per Process:
+------------------------------
+[0] A-9_new_1.5.pdf.trc:
+Used Page Table Entries: 669 ( 0.13%)
+Page Table Wasted: 1309047 bytes
+[1] A-10_new_1.5_a.pdf.trc:
+Used Page Table Entries: 567 ( 0.11%)
+Page Table Wasted: 1309302 bytes

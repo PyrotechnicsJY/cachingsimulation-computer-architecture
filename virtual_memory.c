@@ -136,14 +136,14 @@ void process_trace_vm(Config *cfg,
         while (fgets(line1, LENGTH_MAX, f)) {
             unsigned int ilen;
             unsigned int eip_addr;
-            if (sscanf(line1, "EIP (%u): %x", &ilen, &eip_addr) == 2) {
+            if (sscanf(line1, " EIP (%u): %x", &ilen, &eip_addr) == 2) {
                 vm_translate_addr(pid, (uint32_t)eip_addr, pt_array, phys_mem, stats_per_proc);
                 instr_count++;
                 if (!fgets(line2, LENGTH_MAX, f)) break;
                 unsigned int dst_addr = 0, src_addr = 0;
                 char dst_data[9] = {0}, src_data[9] = {0};
-                int n = sscanf(line2, "dstM: %x %8s srcM: %x %8s",
-                               &dst_addr, dst_data, &src_addr, src_data);
+                int n = sscanf(line2, " dstM: %x %8s srcM: %x %8s",
+               				&dst_addr, dst_data, &src_addr, src_data);
                 if (n == 4) {
                     if (dst_addr != 0 && strcmp(dst_data, "--------") != 0) {
                         vm_translate_addr(pid, (uint32_t)dst_addr, pt_array, phys_mem, stats_per_proc);
