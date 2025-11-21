@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "calculations.h"
-#include "cache.h"
+#include "virtual_memory.h"
 
 static void print_report(const Config *c, const Results *r) {
     printf("Cache Simulator - CS 3853 - Team #1\n\n");
@@ -13,7 +14,8 @@ static void print_report(const Config *c, const Results *r) {
     printf("Cache Size: %d KB\n", c->cache_kb);
     printf("Block Size: %d bytes\n", c->block_bytes);
     printf("Associativity: %d\n", c->associativity);
-    printf("Replacement Policy: %s\n", (c->policy == RP_RR ? "Round Robin" : "Random"));
+    printf("Replacement Policy: %s\n",
+           (c->policy == RP_RR ? "Round Robin" : "Random"));
     printf("Physical Memory: %d MB\n", c->phys_mb);
     printf("Percent Memory Used by System: %.1f%%\n", c->os_percent);
     if (c->time_slice == -1) printf("Instructions / Time Slice: All\n");
@@ -34,31 +36,42 @@ static void print_report(const Config *c, const Results *r) {
     printf("Number of Pages for System: %llu\n",
            (unsigned long long)r->sys_pages);
     printf("Size of Page Table Entry: %d bits\n", r->pte_bits);
-    printf("Total RAM for Page Table(s): %llu bytes\n",(unsigned long long)r->pgt_total_bytes);
+    printf("Total RAM for Page Table(s): %llu bytes\n",
+           (unsigned long long)r->pgt_total_bytes);
 }
 
 int main(int argc, char **argv) {
     Config cfg;
     Results res;
 
-    // NEW: cache structures (not actually used yet in Milestone 2)
-    Cache cache;
-    CacheStats stats = {0};  // zero-init all fields
-
     parse_args(argc, argv, &cfg);
     compute_results(&cfg, &res);
 
-      // Initialize cache based on CLI config
-    if (cache_init(&cache, &cfg) != 0) {
-        fprintf(stderr, "Warning: cache_init failed; continuing without cache.\n");
-        // For Milestone 2 we can still print the calculations & exit normally
-        print_report(&cfg, &res);
-        return 0;
+    page_table *ptables = make_page_table(cfg.num_traces);
+    if (!ptables) return 1;
+
+    physical_memory *phys_mem = make_physical_memory(&res);
+    if (!phys_mem) {
+        free_page_tables(ptables, cfg.num_traces);
+        return 1;
+    }
+
+    statistics *stats = calloc(cfg.num_traces, sizeof(statistics));
+    if (!stats) {
+        free_physical_memory(phys_mem);
+        free_page_tables(ptables, cfg.num_traces);
+        return 1;
     }
 
     print_report(&cfg, &res);
-	process_trace(&cfg,&res);
-    // Clean up cache memory
-    cache_free(&cache);
+
+    process_trace_vm(&cfg, &res, ptables, phys_mem, stats);
+
+    print_vm_results(&cfg, &res, ptables, stats);
+
+    free(stats);
+    free_physical_memory(phys_mem);
+    free_page_tables(ptables, cfg.num_traces);
+
     return 0;
 }
