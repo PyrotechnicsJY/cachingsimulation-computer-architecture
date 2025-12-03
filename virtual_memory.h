@@ -4,58 +4,60 @@
 #include <stdint.h>
 
 #include "calculations.h"
+#include "cache.h"
 
 #define PAGESIZE 4096
-#define NUM_VPAGES (512  * 1024)
+#define NUM_VPAGES (512 * 1024)
 
 typedef struct {
-  uint32_t ppn;
-  uint8_t valid;
-}
-page_table_entry;
+    uint32_t ppn;  // physical page number
+    uint8_t  valid;
+} page_table_entry;
 
 typedef struct {
-  page_table_entry * entries;
-  int max_size_pagetable;
-  int curr_size_pagetable;
-}
-page_table;
+    page_table_entry *entries;        // array of NUM_VPAGES entries
+    int max_size_pagetable;           // number of entries allocated
+    int curr_size_pagetable;          // number of valid entries
+} page_table;
 
 typedef struct {
-  uint32_t * freelist;
-  int num_free_pages;
-  int max_phys_pages;
-}
-physical_memory;
+    uint32_t *freelist;   // stack of free physical page numbers
+    int num_free_pages;   // current number of free pages
+    int max_phys_pages;   // total number of physical pages
+} physical_memory;
 
 typedef struct {
-  int pg_hits;
-  int pg_free;
-  int pg_fault;
-}
-statistics;
+    int pg_hits;   // page table hits
+    int pg_free;   // pages from free list
+    int pg_fault;  // page faults (no free pages)
+} statistics;
 
-page_table * make_page_table(int amountofprocesses);
-void free_page_tables(page_table * pagetables, int amountofprocesses);
+page_table      *make_page_table(int amountofprocesses);
+void             free_page_tables(page_table *pagetables, int amountofprocesses);
 
-physical_memory * make_physical_memory(Results * r);
-void free_physical_memory(physical_memory * phys_mem);
+physical_memory *make_physical_memory(Results *r);
+void             free_physical_memory(physical_memory *phys_mem);
 
+// Translate virtual address -> physical page number (PPN)
 uint32_t vm_translate_addr(int pid,
-  uint32_t vaddr,
-  page_table * pt_array,
-  physical_memory * phys_mem,
-  statistics * stats);
+                           uint32_t vaddr,
+                           page_table *pt_array,
+                           physical_memory *phys_mem,
+                           statistics *stats);
 
-void process_trace_vm(Config * cfg,
-  Results * res,
-  page_table * pt_array,
-  physical_memory * phys_mem,
-  statistics * stats_per_proc);
+// Process trace files: perform VM mapping and cache simulation.
+void process_trace_vm(Config *cfg,
+                      Results *res,
+                      page_table *pt_array,
+                      physical_memory *phys_mem,
+                      statistics *stats_per_proc,
+                      Cache *cache,
+                      CacheStats *cstats);
 
-void print_vm_results(Config * cfg,
-  Results * res,
-  page_table * pt_array,
-  statistics * stats_per_proc);
+// Print milestone #2 style virtual memory results.
+void print_vm_results(Config *cfg,
+                      Results *res,
+                      page_table *pt_array,
+                      statistics *stats_per_proc);
 
 #endif

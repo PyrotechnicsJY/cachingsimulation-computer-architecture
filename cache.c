@@ -24,9 +24,6 @@ static unsigned ilog2_u32(uint32_t x) {
 /*
  * Initialize cache data structure based on Config.
  *
- * NOTE: This sets up all the fields and allocates memory, but does NOT
- * perform any actual cache simulation. That's for Milestone 3.
- *
  * Returns:
  *   0  on success
  *  -1  on error (bad params or allocation failure)
@@ -64,7 +61,7 @@ int cache_init(Cache *cache, const Config *cfg) {
         return -1;
     }
 
-    // Bit counts (32-bit physical addresses)
+    // Bit counts (assume 32-bit physical addresses)
     cache->offset_bits = ilog2_u32(cache->block_size);
     cache->index_bits  = ilog2_u32(cache->num_sets);
     cache->tag_bits    = 32u - cache->offset_bits - cache->index_bits;
@@ -115,45 +112,110 @@ void cache_free(Cache *cache) {
 }
 
 /*
- * Stub for cache access.
- *
- * For Milestone 2: this just bumps the access counter (if provided) and
- * returns success. No hits/misses are tracked yet.
- *
- * For Milestone 3: we will:
- *   - Decode addr into tag/index/offset
- *   - Search the appropriate set
- *   - Update stats->hits/misses/compulsory_misses/conflict_misses
- *   - Use RR/RND replacement when needed
+ * Flush the entire cache: mark all lines invalid.
  */
-int cache_access(Cache *cache, CacheStats *stats, paddr_t addr, uint32_t size) {
-    (void)addr;  // unused for now
-    (void)size;  // unused for now
-
-    if (!cache || !stats) {
-        return -1;
+void cache_flush(Cache *cache) {
+    if (!cache || !cache->sets) return;
+    for (uint32_t i = 0; i < cache->num_sets; ++i) {
+        CacheSet *set = &cache->sets[i];
+        set->rr_next = 0;
+        for (uint32_t w = 0; w < cache->associativity; ++w) {
+            set->lines[w].valid = 0;
+            // keep ever_used as-is so "unused blocks" metric still works
+        }
     }
-
-    stats->accesses++;
-
-    // TODO (Milestone 3): implement real cache behavior here.
-
-    return 0;
 }
 
 /*
- * Stub for invalidating entries that map to a given physical page.
- *
- * For Milestone 2: no-op.
- *
- * For Milestone 3: we may use this to:
- *   - Invalidate cache lines when a physical page is freed/swapped
- *   - Invalidate cache lines when a process exits, etc.
+ * Internal helper: perform a single-block access for the block that
+ * contains 'block_addr' (which should be aligned to block_size).
  */
-void cache_invalidate_page(Cache *cache, uint32_t phys_page_num, uint32_t page_size) {
-    (void)cache;
-    (void)phys_page_num;
-    (void)page_size;
+static void cache_access_block(Cache *cache, CacheStats *stats, paddr_t block_addr) {
+    // Decode physical address into tag and index
+    uint32_t block_index_addr = block_addr >> cache->offset_bits;
+    uint32_t index = block_index_addr & (cache->num_sets - 1u);
+    uint32_t tag   = block_index_addr >> cache->index_bits;
 
-    // TODO (Milestone 3): walk cache and invalidate lines that map to this page.
+    CacheSet *set = &cache->sets[index];
+
+    stats->accesses++;
+
+    // Look for a hit
+    for (uint32_t w = 0; w < cache->associativity; ++w) {
+        CacheLine *line = &set->lines[w];
+        if (line->valid && line->tag == tag) {
+            // Hit
+            stats->hits++;
+            stats->total_cycles += 1; // cache hit = 1 cycle
+            return;
+        }
+    }
+
+    // Miss
+    stats->misses++;
+
+    // Determine if there is an invalid line => compulsory miss
+    int invalid_index = -1;
+    for (uint32_t w = 0; w < cache->associativity; ++w) {
+        CacheLine *line = &set->lines[w];
+        if (!line->valid) {
+            invalid_index = (int)w;
+            break;
+        }
+    }
+
+    uint32_t victim_way;
+    if (invalid_index >= 0) {
+        // Compulsory miss: choose the first invalid line
+        stats->compulsory_misses++;
+        victim_way = (uint32_t)invalid_index;
+    } else {
+        // Conflict miss: all lines are valid => choose victim via policy
+        stats->conflict_misses++;
+        if (cache->policy == RP_RND) {
+            victim_way = (uint32_t)(rand() % (int)cache->associativity);
+        } else {
+            // Round-robin
+            victim_way = cache->sets[index].rr_next;
+            cache->sets[index].rr_next =
+                (cache->sets[index].rr_next + 1u) % cache->associativity;
+        }
+    }
+
+    CacheLine *victim = &set->lines[victim_way];
+    victim->valid = 1;
+    victim->tag   = tag;
+    victim->ever_used = 1;
+
+    // Miss penalty: number of memory reads = ceil(block_size / 4),
+    // each memory read costs 4 cycles.
+    uint32_t reads = (cache->block_size + 4u - 1u) / 4u;
+    stats->total_cycles += (uint64_t)reads * 4u;
+}
+
+/*
+ * Simulate a memory access of 'size' bytes starting at physical 'addr'.
+ *
+ * We treat a "cache access" as one touch per cache row (block). So if the
+ * access spans N distinct blocks, that results in N accesses.
+ */
+int cache_access(Cache *cache, CacheStats *stats, paddr_t addr, uint32_t size) {
+    if (!cache || !stats || size == 0) {
+        return -1;
+    }
+
+    uint32_t block_size = cache->block_size;
+
+    // Align to first block covering 'addr'
+    uint32_t first_block_addr = addr & ~(block_size - 1u);
+    uint32_t last_addr = addr + size - 1u;
+    uint32_t last_block_addr = last_addr & ~(block_size - 1u);
+
+    for (uint32_t block_addr = first_block_addr;
+         block_addr <= last_block_addr;
+         block_addr += block_size) {
+        cache_access_block(cache, stats, block_addr);
+    }
+
+    return 0;
 }

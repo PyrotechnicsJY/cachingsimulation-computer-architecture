@@ -30,7 +30,7 @@ typedef struct {
 
     uint32_t       index_bits;        // number of index bits
     uint32_t       offset_bits;       // number of block-offset bits
-    uint32_t       tag_bits;          // number of tag bits
+    uint32_t       tag_bits;          // number of tag bits (for 32-bit phys addr)
 
     repl_policy_t  policy;            // RP_RR or RP_RND
 
@@ -40,19 +40,29 @@ typedef struct {
 
 // Cache statistics (used for Milestone #3)
 typedef struct {
-    uint64_t accesses;           // total cache accesses
+    uint64_t accesses;           // total cache accesses (row touches)
     uint64_t hits;               // hits
     uint64_t misses;             // misses
-    uint64_t compulsory_misses;  // first reference to a block
-    uint64_t conflict_misses;    // miss to a set that already has only valid lines
+    uint64_t compulsory_misses;  // miss that fills a previously-never-used line
+    uint64_t conflict_misses;    // miss when all lines in set are already valid
+
+    uint64_t instr_bytes;        // total instruction bytes fetched
+    uint64_t srcdst_bytes;       // total src/dst data bytes accessed
+
+    uint64_t total_cycles;       // total simulated cycles (cache+memory+exec/EA)
+    uint64_t instr_count;        // number of instructions processed
 } CacheStats;
 
-// Initialization / teardown (implement later)
+// Initialization / teardown
 int  cache_init(Cache *cache, const Config *cfg);
 void cache_free(Cache *cache);
 
-// Access & maintenance (implement later)
+// Flush entire cache (used on page faults for simplicity)
+void cache_flush(Cache *cache);
+
+// Access & maintenance
+// Simulate a memory access to [addr, addr+size-1].
+// Returns 0 on success, -1 on bad args.
 int  cache_access(Cache *cache, CacheStats *stats, paddr_t addr, uint32_t size);
-void cache_invalidate_page(Cache *cache, uint32_t phys_page_num, uint32_t page_size);
 
 #endif // CACHE_H
