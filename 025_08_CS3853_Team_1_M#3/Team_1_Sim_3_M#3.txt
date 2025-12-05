@@ -1,0 +1,74 @@
+Cache Simulator - CS 3853 - Team #1
+
+Trace File(s):
+        A-9_new_1.5.pdf.trc
+        A-10_new_1.5_a.pdf.trc
+        A-9_new_trunk1.trc
+***** Cache Input Parameters *****
+
+Cache Size: 8192 KB
+Block Size: 32 bytes
+Associativity: 8
+Replacement Policy: Round Robin
+Physical Memory: 1024 MB
+Percent Memory Used by System: 75.0%
+Instructions / Time Slice: 100
+
+***** Cache Calculated Values *****
+
+Total # Blocks: 262144
+Tag Size: 10 bits
+Index Size: 15 bits
+Total # Rows: 32768
+Overhead Size: 360448 bytes
+Implementation Memory Size: 8544.00 KB (8749056 bytes)
+Cost: $598.08 @ $0.07 per KB
+
+***** Physical Memory Calculated Values *****
+
+Number of Physical Pages: 262144
+Number of Pages for System: 196608
+Size of Page Table Entry: 19 bits
+Total RAM for Page Table(s): 3735552 bytes
+***** VIRTUAL MEMORY SIMULATION RESULTS *****
+
+Physical Pages Used By SYSTEM:   196608
+Pages Available to User:         65536
+
+Virtual Pages Mapped:            29
+        ------------------------------
+        Page Table Hits: 369
+
+        Pages from Free: 29
+
+        Total Page Faults: 0
+
+Page Table Usage Per Process:
+------------------------------
+[0] A-9_new_1.5.pdf.trc:
+       Used Page Table Entries: 10 ( 0.00%)
+       Page Table Wasted: 1245160 bytes
+[1] A-10_new_1.5_a.pdf.trc:
+       Used Page Table Entries: 8 ( 0.00%)
+       Page Table Wasted: 1245165 bytes
+[2] A-9_new_trunk1.trc:
+       Used Page Table Entries: 11 ( 0.00%)
+       Page Table Wasted: 1245157 bytes
+***** CACHE SIMULATION RESULTS *****
+
+Total Cache Accesses:   409
+--- Instruction Bytes: 805
+--- SrcDst Bytes:  392
+Cache Hits:             320
+Cache Misses:           89
+--- Compulsory Misses:  89
+--- Conflict Misses:    0
+
+
+***** *****  CACHE HIT & MISS RATE:  ***** *****
+
+Hit  Rate:              78.2396%
+Miss Rate:              21.7604%
+CPI:                    12.89 Cycles/Instruction  (3866)
+Unused Cache Space:     8541.10 KB / 8544.00 KB = 99.97%  Waste: $597.88/chip
+Unused Cache Blocks:    262055 / 262144
